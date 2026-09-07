@@ -20,11 +20,13 @@ const getUserById = async (req, res, next) => {
   try {
     const user = await findUserById(req.params.id);
 
-    if (user) {
-      res.json(user);
-    } else {
-      res.sendStatus(404);
+    if (!user) {
+      const error = new Error('User not found');
+      error.status = 404;
+      return next(error);
     }
+
+    res.json(user);
   } catch (error) {
     next(error);
   }
@@ -37,14 +39,16 @@ const postUser = async (req, res, next) => {
 
     const result = await addUser(req.body);
 
-    if (result) {
-      res.status(201).json({
-        message: 'New user added.',
-        result,
-      });
-    } else {
-      res.sendStatus(400);
+    if (!result) {
+      const error = new Error('User could not be added');
+      error.status = 400;
+      return next(error);
     }
+
+    res.status(201).json({
+      message: 'New user added.',
+      result,
+    });
   } catch (error) {
     next(error);
   }
@@ -56,18 +60,22 @@ const putUser = async (req, res, next) => {
     const userId = Number(req.params.id);
 
     if (loggedInUser.user_id !== userId && loggedInUser.role !== 'admin') {
-      return res.sendStatus(403);
+      const error = new Error('Not allowed to update this user');
+      error.status = 403;
+      return next(error);
     }
 
     const result = await modifyUser(req.body, userId);
 
-    if (result) {
-      res.json({
-        message: 'User item updated.',
-      });
-    } else {
-      res.sendStatus(404);
+    if (!result) {
+      const error = new Error('User not found');
+      error.status = 404;
+      return next(error);
     }
+
+    res.json({
+      message: 'User item updated.',
+    });
   } catch (error) {
     next(error);
   }
@@ -78,21 +86,24 @@ const deleteUser = async (req, res, next) => {
     const userId = Number(req.params.id);
 
     if (loggedInUser.user_id !== userId && loggedInUser.role !== 'admin') {
-      return res.sendStatus(403);
+      const error = new Error('Not allowed to delete this user');
+      error.status = 403;
+      return next(error);
     }
 
     const result = await removeUser(userId);
 
-    if (result) {
-      res.json({
-        message: 'User item deleted.',
-      });
-    } else {
-      res.sendStatus(404);
+    if (!result) {
+      const error = new Error('User not found');
+      error.status = 404;
+      return next(error);
     }
+
+    res.json({
+      message: 'User item deleted.',
+    });
   } catch (error) {
     next(error);
   }
 };
-
 export { getUsers, getUserById, postUser, putUser, deleteUser };
