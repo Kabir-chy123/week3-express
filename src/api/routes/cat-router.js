@@ -14,7 +14,7 @@ const catRouter = express.Router();
 catRouter.get('/', getCats);
 catRouter.get('/:id', getCatById);
 
-catRouter.post('/', upload.single('image'), createThumbnail, addCat);
+catRouter.post('/', upload.single('cat'), createThumbnail, addCat);
 
 catRouter.put('/:id', updateCat);
 catRouter.delete('/:id', deleteCat);

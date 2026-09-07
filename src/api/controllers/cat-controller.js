@@ -13,13 +13,17 @@ const getCatById = (req, res) => {
 };
 
 const addCat = (req, res) => {
-  const newCat = req.body;
+  console.log('body:', req.body);
+  console.log('file:', req.file);
+
+  const newCat = {
+    ...req.body,
+    filename: req.file.filename,
+  };
 
   catItems.push(newCat);
-
   res.json(newCat);
 };
-
 const updateCat = (req, res) => {
   res.json({
     message: 'Cat item updated.',
