@@ -1,3 +1,4 @@
+import bcrypt from 'bcrypt';
 import {
   listAllUsers,
   findUserById,
@@ -31,6 +32,9 @@ const getUserById = async (req, res, next) => {
 
 const postUser = async (req, res, next) => {
   try {
+    req.body.role = 'user';
+    req.body.password = bcrypt.hashSync(req.body.password, 10);
+
     const result = await addUser(req.body);
 
     if (result) {
@@ -48,7 +52,14 @@ const postUser = async (req, res, next) => {
 
 const putUser = async (req, res, next) => {
   try {
-    const result = await modifyUser(req.body, req.params.id);
+    const loggedInUser = res.locals.user;
+    const userId = Number(req.params.id);
+
+    if (loggedInUser.user_id !== userId && loggedInUser.role !== 'admin') {
+      return res.sendStatus(403);
+    }
+
+    const result = await modifyUser(req.body, userId);
 
     if (result) {
       res.json({
@@ -61,10 +72,16 @@ const putUser = async (req, res, next) => {
     next(error);
   }
 };
-
 const deleteUser = async (req, res, next) => {
   try {
-    const result = await removeUser(req.params.id);
+    const loggedInUser = res.locals.user;
+    const userId = Number(req.params.id);
+
+    if (loggedInUser.user_id !== userId && loggedInUser.role !== 'admin') {
+      return res.sendStatus(403);
+    }
+
+    const result = await removeUser(userId);
 
     if (result) {
       res.json({

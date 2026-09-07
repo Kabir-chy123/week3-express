@@ -1,5 +1,5 @@
 import express from 'express';
-
+import { authenticateToken } from '../../middlewares/authentication.js';
 import {
   getUsers,
   getUserById,
@@ -15,9 +15,7 @@ userRouter.get('/', getUsers);
 userRouter.get('/:id', getUserById);
 
 userRouter.post('/', postUser);
-
-userRouter.put('/:id', putUser);
-
-userRouter.delete('/:id', deleteUser);
+userRouter.put('/:id', authenticateToken, putUser);
+userRouter.delete('/:id', authenticateToken, deleteUser);
 
 export default userRouter;
