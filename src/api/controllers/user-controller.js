@@ -6,20 +6,21 @@ const getUsers = (req, res) => {
 
 const getUserById = (req, res) => {
   const id = Number(req.params.id);
-
   const user = userItems.find((item) => item.user_id === id);
+
+  if (!user) {
+    return res.sendStatus(404);
+  }
 
   res.json(user);
 };
-
 const addUser = (req, res) => {
   const newUser = req.body;
 
   userItems.push(newUser);
 
-  res.json(newUser);
+  res.status(201).json(newUser);
 };
-
 const updateUser = (req, res) => {
   res.json({
     message: 'User item updated.',

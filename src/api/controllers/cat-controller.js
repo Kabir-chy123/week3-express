@@ -6,8 +6,11 @@ const getCats = (req, res) => {
 
 const getCatById = (req, res) => {
   const id = Number(req.params.id);
-
   const cat = catItems.find((item) => item.cat_id === id);
+
+  if (!cat) {
+    return res.sendStatus(404);
+  }
 
   res.json(cat);
 };
@@ -17,7 +20,7 @@ const addCat = (req, res) => {
 
   catItems.push(newCat);
 
-  res.json(newCat);
+  res.status(201).json(newCat);
 };
 
 const updateCat = (req, res) => {
