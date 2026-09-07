@@ -1,35 +1,81 @@
-import userItems from '../models/user-model.js';
+import {
+  listAllUsers,
+  findUserById,
+  addUser,
+  modifyUser,
+  removeUser,
+} from '../models/user-model.js';
 
-const getUsers = (req, res) => {
-  res.json(userItems);
+const getUsers = async (req, res, next) => {
+  try {
+    const users = await listAllUsers();
+    res.json(users);
+  } catch (error) {
+    next(error);
+  }
 };
 
-const getUserById = (req, res) => {
-  const id = Number(req.params.id);
+const getUserById = async (req, res, next) => {
+  try {
+    const user = await findUserById(req.params.id);
 
-  const user = userItems.find((item) => item.user_id === id);
-
-  res.json(user);
+    if (user) {
+      res.json(user);
+    } else {
+      res.sendStatus(404);
+    }
+  } catch (error) {
+    next(error);
+  }
 };
 
-const addUser = (req, res) => {
-  const newUser = req.body;
+const postUser = async (req, res, next) => {
+  try {
+    const result = await addUser(req.body);
 
-  userItems.push(newUser);
-
-  res.json(newUser);
+    if (result) {
+      res.status(201).json({
+        message: 'New user added.',
+        result,
+      });
+    } else {
+      res.sendStatus(400);
+    }
+  } catch (error) {
+    next(error);
+  }
 };
 
-const updateUser = (req, res) => {
-  res.json({
-    message: 'User item updated.',
-  });
+const putUser = async (req, res, next) => {
+  try {
+    const result = await modifyUser(req.body, req.params.id);
+
+    if (result) {
+      res.json({
+        message: 'User item updated.',
+      });
+    } else {
+      res.sendStatus(404);
+    }
+  } catch (error) {
+    next(error);
+  }
 };
 
-const deleteUser = (req, res) => {
-  res.json({
-    message: 'User item deleted.',
-  });
+const deleteUser = async (req, res, next) => {
+  try {
+    const result = await removeUser(req.params.id);
+
+    if (result) {
+      res.json({
+        message: 'User item deleted.',
+      });
+    } else {
+      res.sendStatus(404);
+    }
+  } catch (error) {
+    next(error);
+  }
 };
 
-export { getUsers, getUserById, addUser, updateUser, deleteUser };
+export { getUsers, getUserById, postUser, putUser, deleteUser };
